@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title></title>
+  </head>
+  <body>
+    <div class="main_div">
+      <div class="music_container">
+        <h2 id="title">Aao Baccho</h2>
+        <h3 id="artist">Adinath Mangeshkar</h3>
+        <div class="img_container">
+          <img src="sai-4.jfif" alt="" />
+        </div>
+        <audio src="sai-4.mp3"></audio>
+
+        <!-- Progress Bar -->
+        <div class="progressbar_container" id="progress_container">
+          <div class="progress_duration_meter">
+            <div id="current_time">0:00</div>
+            <div id="duration">2:38</div>
+          </div>
+          <div class="progress_div" id="progress_div">
+            <div class="progress" id="progress"></div>
+          </div>
+        </div>
+
+        <!-- controls -->
+        <div class="music_controls">
+          <i class="fas fa-backward" id="prev" title="Previous"></i>
+          <i class="fas fa-play main-button" id="play" title="Play"></i>
+          <i class="fas fa-forward" id="next" title="Next"></i>
+        </div>
+      </div>
+    </div>
+    <script>
+      const music = document.querySelector("audio");
+      const img = document.querySelector("img");
+      const play = document.getElementById("play");
+      const artist = document.getElementById("artist");
+      const title = document.getElementById("title");
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+
+      let progress = document.getElementById("progress");
+      let total_duration = document.getElementById("duration");
+      let current_time = document.getElementById("current_time");
+      const progress_div = document.getElementById("progress_div");
+
+      const songs = [
+        {
+          name: "sai-4",
+          title: "Aao Baccho",
+          artist: "Adinath Mangeshkar ",
+        },
+        {
+          name: "sai-5",
+          title: "Oonchi Oonchi",
+          artist: "Mohammad Rafi",
+        },
+        {
+          name: "sai-6",
+          title: "Tel Malish",
+          artist: "Chitragupt",
+        },
+        {
+          name: "sai-7",
+          title: "Kahin Deep Jalen",
+          artist: "Lata Mangeshkar",
+        },
+        {
+          name: "sai-8",
+          title: "Tunhe Mujhe Jaana",
+          artist: "Kishore Kumar",
+        },
+        {
+          name: "sai-9",
+          title: "Tunhe Mujhe (2)",
+          artist: "Kishore Kumar",
+        },
+        {
+          name: "sai-10",
+          title: "Aane Waala Pal",
+          artist: "Kishore Kumar",
+        },
+        {
+          name: "sai-11",
+          title: "Mai Gaau",
+          artist: "Mohammad Rafi",
+        },
+        {
+          name: "sai-12",
+          title: "Chakke me Chakka",
+          artist: "Mohammad Rafi",
+        },
+        {
+          name: "sai-13",
+          title: "Mere Sapno ki Rani",
+          artist: "Kishore Kumar",
+        },
+      ];
+
+      let isPlaying = false;
+
+      const playMusic = () => {
+        isPlaying = true;
+        music.play();
+        play.classList.replace("fa-play", "fa-pause");
+        img.classList.add("anime");
+      };
+
+      const pauseMusic = () => {
+        isPlaying = false;
+        music.pause();
+        play.classList.replace("fa-pause", "fa-play");
+        img.classList.remove("anime");
+      };
+
+      play.addEventListener("click", () => {
+        isPlaying ? pauseMusic() : playMusic();
+      });
+
+      //   Changing the music data
+
+      const loadSong = (songs) => {
+        title.textContent = songs.title;
+        artist.textContent = songs.artist;
+        music.src = songs.name + ".mp3";
+        img.src = songs.name + ".jfif";
+      };
+
+      songIndex = 0;
+      // loadSong(songs[2]);
+
+      const nextSong = () => {
+        songIndex = (songIndex + 1) % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+
+      const prevSong = () => {
+        songIndex = (songIndex - 1 + songs.length) % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+
+      // Progress Js Work
+
+      music.addEventListener("timeupdate", (event) => {
+        // console.log(event);
+        const { currentTime, duration } = event.srcElement;
+        // console.log(currentTime);
+        // console.log(duration);
+
+        let progress_time = (currentTime / duration) * 100;
+        progress.style.width = `${progress_time}%`;
+
+        // Music Duration Update
+        let min_duration = Math.floor(duration / 60);
+        let sec_duration = Math.floor(duration % 60);
+        // console.log(min_duration);
+        // console.log(sec_duration);
+        let tot_duration = `${min_duration}:${sec_duration}`;
+        if (duration) {
+          total_duration.textContent = `${tot_duration}`;
+        }
+
+        // Current Duration Update
+
+        let min_currentTime = Math.floor(currentTime / 60);
+        let sec_currentTime = Math.floor(currentTime % 60);
+        // console.log(min_currentTime);
+        // console.log(sec_currentTime);
+        if (sec_currentTime < 10) {
+          sec_currentTime = `0${sec_currentTime}`;
+        }
+        let tot_currentTime = `${min_currentTime}:${sec_currentTime}`;
+        current_time.textContent = `${tot_currentTime}`;
+      });
+
+      // Progress Div Onclick Functionality
+
+      progress_div.addEventListener("click", (event) => {
+        // console.log(event);
+        const { duration } = music;
+        let move_progress =
+          (event.offsetX / event.srcElement.clientWidth) * duration;
+        // console.log(move_progress);
+
+        music.currentTime = move_progress;
+      });
+
+      // If music ends, call next song function
+      music.addEventListener("ended", nextSong);
+
+      next.addEventListener("click", nextSong);
+      prev.addEventListener("click", prevSong);
+    </script>
+  </body>
+</html>
